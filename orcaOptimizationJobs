@@ -1,4 +1,4 @@
-#! /use/bin/env python
+#! /usr/bin/env python
 #code will take structures from the input directory, move them to the appropriate place, write the necessary input files for the calculation, and submit the calculation.
 
 import os
