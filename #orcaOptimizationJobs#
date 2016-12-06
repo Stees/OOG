@@ -50,7 +50,7 @@ def writeScripts( filePath, structureFile ):
     optimizationFile.write('#functional, number of basis sets, dispersion correction\n')
     optimizationFile.write('! PBE Def2-TZVP TIGHTSCF OPT D3BJ\n\n')
     optimizationFile.write('%scf\nMaxIter 500\nend\n')
-    #optimizationFile.write('%geom\nMaxIter 1000\nend\n')
+    optimizationFile.write('%geom\nMaxIter 1000\nend\n')
     optimizationFile.write('#the numbers after xyzfile correspond to charge and multiplicity\n')
     optimizationFile.write('* xyzfile 0 1 {0}\n'.format(structureFile))
     optimizationFile.close()
