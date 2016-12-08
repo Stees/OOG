@@ -11,7 +11,8 @@ import time
 
 def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
     if '_' not in struc:
-        subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
+        #subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
+        subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","c").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
         time.sleep(1)
         shutil.move(rDirectory, wFile)
     elif '_' in struc and number !=1:
@@ -92,7 +93,7 @@ for counter, line in enumerate(Lines):
         #compare the name of the structure to the names already present and determine if it needs to be optimized
         structureCreate = 1
         for itemCount, structure in enumerate(finalELines):
-            if (line.rsplit('.',1)[0].lower() == structure.lower()):
+            if (line.rsplit('.',1)[0].lower().replace(',','c') == structure.lower().replace(',','c')):
                 print('{0} is a repeated structure and will not be optimized'.format(line))
                 structureCreate = 0
                 break
@@ -104,14 +105,14 @@ for counter, line in enumerate(Lines):
             if (name == 'jpr54'):
                 createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/'
                 readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz',''), str(line))
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}'.format(str(line).replace('.xyz',''))
+                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
+                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
                 
             elif (name == 'krb115'):
                 createDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/'
                 readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz',''), str(line))
-                writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz',''))
+                writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
+                writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
 
             N = 0 #there will never be more than one optimization for a single molecule
             #move the structure to the appropriate directory
@@ -137,14 +138,14 @@ for counter, line in enumerate(Lines):
         #if configurations of the molecules have been run before, identify the highest numbered configuration that has been run.
         maxNumber1, maxNumber2 = '0', '0'
         for configs in eLinesI1:
-            if (line.rsplit('_',1)[0].lower() == configs.lower()):
+            if (line.rsplit('_',1)[0].lower().replace(',','c') == configs.lower().replace(',','c')):
                 #print('in loop\n')
-                location = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0])
+                location = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
                 maxNumber1 = findNumber( location )
                 break
         for configs in eLinesI2:
             if (line.rsplit('_',1)[0].lower() == configs.lower()):
-                location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0])
+                location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
                 maxNumber2 = findNumber ( location )
                 break
         highestNumber = int(max(maxNumber1, maxNumber2).replace('/',''))
@@ -158,30 +159,30 @@ for counter, line in enumerate(Lines):
             if (name == 'jpr54'):
                 createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/'
                 readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/{1}'.format(str(line).rsplit('_',1)[0], str(line).rsplit('_',1)[0]+'_1.xyz')
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1'.format(str(line).rsplit('_',1)[0])
+                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
+                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1'.format(str(line).rsplit('_',1)[0].replace(',','c'))
                 xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
 
             elif (name == 'krb115'):
                 createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/'
                 readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1/{1}'.format(str(line).rsplit('_',1)[0], str(line).rsplit('_',1)[0]+'_1.xyz')
-                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1'.format(str(line))
+                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
+                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1'.format(str(line).rsplit('_',1)[0].replace(',','c'))
                 xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
             
         elif (highestNumber != 0):
             if (name == 'jpr54'):
-                createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/'.format(str(line).rsplit('_',1)[0])
+                createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
                 readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0], writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
+                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
                 writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/'.format(str(line).rsplit('_',1)[0], writeNumber)
                 xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
 
             elif (name == 'krb115'):
-                createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{1}/'.format(str(line).rsplit('_',1)[0])
+                createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
                 readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0], writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
-                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/'.format(str(line).rsplit('_',1)[0], writeNumber)
+                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
+                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber)
                 xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
 
         moveStructure( line, writeNumber, createDirectory, readDirectory, writeFile )
