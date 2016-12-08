@@ -32,7 +32,7 @@ def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
 def writeScripts( filePath, structureFile ):
     jobfile = open('{0}/job.pbs'.format(filePath), 'a')
     jobfile.write('#!/bin/bash\n\n')
-    jobfile.write('#PBS -N {0}\n'.format(structureFile.replace('.xyz','')))
+    jobfile.write('#PBS -N "{0}"\n'.format(structureFile.replace('.xyz','')))
     jobfile.write('#PBS -r n\n')
     jobfile.write('#PBS -q one_day\n')
     jobfile.write('#PBS -l nodes=1:ppn=8\n')
