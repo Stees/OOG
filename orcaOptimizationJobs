@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #code will take structures from the input directory, move them to the appropriate place, write the necessary input files for the calculation, and submit the calculation.
 
-import os
+#import os
 import subprocess
 import readline
 import numpy as np
@@ -188,6 +188,11 @@ for counter, line in enumerate(Lines):
         moveStructure( line, writeNumber, createDirectory, readDirectory, writeFile )
         writeScripts( writeDirectory, xyzName )
         job = subprocess.Popen('qsub job.pbs', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
-        print('{0} {1}'.format(str(job.communicate()[0].split()).rsplit('.')[0].replace("['",""),line.replace('.xyz','')))
+        jobNumber = str(job.communicate()[0].split()).rsplit('.')[0].replace("['","")
+        print('{0} {1}'.format(jobNumber,line.replace('.xyz','')))
+        #append job number to the JobId file so it can be compared in bindingEnergyTracker
+        jobFile = open('{0}JobId'.format(writeDirectory), 'w')
+        jobFile.write('{0}'.format(jobNumber))
+        jobFile.close()
         
 
