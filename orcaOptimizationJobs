@@ -160,7 +160,7 @@ for counter, line in enumerate(Lines):
                 createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/'
                 readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
                 writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1'.format(str(line).rsplit('_',1)[0].replace(',','c'))
+                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
                 xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
 
             elif (name == 'krb115'):
