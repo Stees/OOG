@@ -31,7 +31,7 @@ def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
     return
 
 def writeScripts( filePath, structureFile ):
-    jobfile = open('{0}/job.pbs'.format(filePath), 'a')
+    jobfile = open('{0}/job.pbs'.format(filePath), 'w')
     jobfile.write('#!/bin/bash\n\n')
     jobfile.write('#PBS -N "{0}"\n'.format(structureFile.replace('.xyz','')))
     jobfile.write('#PBS -r n\n')
@@ -46,7 +46,7 @@ def writeScripts( filePath, structureFile ):
     jobfile.write('exit 0\n')
     jobfile.close()
         
-    optimizationFile = open('{0}/geometryOptimizationOrca.inp'.format(filePath), 'a')
+    optimizationFile = open('{0}/geometryOptimizationOrca.inp'.format(filePath), 'w')
     optimizationFile.write('#give keywords by using !\n')
     optimizationFile.write('#functional, number of basis sets, dispersion correction\n')
     optimizationFile.write('! PBE Def2-TZVP TIGHTSCF OPT D3BJ\n\n')
@@ -60,7 +60,7 @@ def writeScripts( filePath, structureFile ):
 def findNumber( directory ):
     tempNum = subprocess.Popen(r'ls -d */', stdout=subprocess.PIPE, cwd=directory, shell=True)
     number = tempNum.communicate()[0].split()
-    maxNum = max(number)
+    maxNum = len(number)
     return maxNum
     
 
@@ -148,10 +148,9 @@ for counter, line in enumerate(Lines):
                 location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
                 maxNumber2 = findNumber ( location )
                 break
-        highestNumber = int(max(maxNumber1, maxNumber2).replace('/',''))
+        highestNumber = int(max(int(maxNumber1),int(maxNumber2)))
         #print('{0}'.format(highestNumber))
         writeNumber = highestNumber + 1
-        #print('{0}'.format(highestNumber))
 
         #now that the highest existing number has been identified, create the directory in the appropriate location for the user. If highestNumber is 0, do a separate function call
         if highestNumber == 0:
