@@ -13,19 +13,19 @@ def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
     if '_' not in struc:
         #subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
         subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","c").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
-        time.sleep(1)
+        time.sleep(0.004)
         shutil.move(rDirectory, wFile)
     elif '_' in struc and number !=1:
         subprocess.Popen('mkdir {0}'.format(number), cwd=creDirectory, shell=True)
-        time.sleep(1)
+        time.sleep(0.004)
         shutil.move(rDirectory, wFile)
     elif '_' in struc and number == 1:
         #make the outer directory with the name of the structure first
         subprocess.Popen('mkdir {0}'.format(str(struc).rsplit('_',1)[0]), cwd=creDirectory, shell=True)
-        time.sleep(1)
+        time.sleep(0.004)
         #make inner directory
         subprocess.Popen('mkdir {0}'.format(str(number)), cwd=creDirectory+'/'+str(struc).rsplit('_',1)[0]+'/', shell=True)
-        time.sleep(1)
+        time.sleep(0.004)
         #move the file
         shutil.move(rDirectory, wFile)
     return
@@ -121,9 +121,9 @@ for counter, line in enumerate(Lines):
             #now call the function to write the job.pbs and .inp files, passing it the filepath to use and the name of the structure file.
             writeScripts( writeDirectory ,line )
 
-            #submit the job. Need to change to the job directory. May need to move these to a function
+            #submit the job.
             job = subprocess.Popen('qsub job.pbs', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
-            #get the job number and structure name. Improve to test that submitted jobs completed correctly, and continue them if they did not finish.
+            #get the job number and structure name.
             print('{0} {1}'.format(str(job.communicate()[0].split()).rsplit('.')[0].replace("['",""),line.replace('.xyz','')))
 
     elif '_' in line:
