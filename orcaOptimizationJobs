@@ -13,19 +13,19 @@ def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
     if '_' not in struc:
         #subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
         subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","c").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
-        time.sleep(0.004)
+        time.sleep(0.010)
         shutil.move(rDirectory, wFile)
     elif '_' in struc and number !=1:
         subprocess.Popen('mkdir {0}'.format(number), cwd=creDirectory, shell=True)
-        time.sleep(0.004)
+        time.sleep(0.010)
         shutil.move(rDirectory, wFile)
     elif '_' in struc and number == 1:
         #make the outer directory with the name of the structure first
         subprocess.Popen('mkdir {0}'.format(str(struc).rsplit('_',1)[0]), cwd=creDirectory, shell=True)
-        time.sleep(0.004)
+        time.sleep(0.010)
         #make inner directory
         subprocess.Popen('mkdir {0}'.format(str(number)), cwd=creDirectory+'/'+str(struc).rsplit('_',1)[0]+'/', shell=True)
-        time.sleep(0.004)
+        time.sleep(0.010)
         #move the file
         shutil.move(rDirectory, wFile)
     return
