@@ -46,6 +46,8 @@ def writeScripts( filePath, structureFile ):
     jobfile.write('cp $PBS_O_WORKDIR/{*inp,*xyz} $SCRATCH\n')
     jobfile.write('run_on_exit(){\n')
     jobfile.write('    cp -R $SCRATCH/* $PBS_O_WORKDIR/\n')
+    jobfile.write('    cd $PBS_O_WORKDIR\n')
+    jobfile.write('    find ./ -type f -exec chmod 640 {} +\n')
     jobfile.write('}\n')
     jobfile.write('trap run_on_exit EXIT\n')
     jobfile.write('$(which orca) geometryOptimizationOrca.inp > geometryOptimizationOrca.out\n')
@@ -194,7 +196,7 @@ for counter, line in enumerate(Lines):
         writeScripts( writeDirectory, xyzName )
         job = subprocess.Popen('qsub job.pbs', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
         jobNumber = str(job.communicate()[0].split()).rsplit('.')[0].replace("['","")
-        print('{0} {1}'.format(jobNumber,line.replace('.xyz','')))
+        print('{0} {1}'.format(jobNumber,str(line).rsplit('_',1)[0]+'_'+str(writeNumber)))
         #append job number to the JobId file so it can be compared in bindingEnergyTracker
         jobFile = open('{0}JobId'.format(writeDirectory), 'w')
         jobFile.write('{0}'.format(jobNumber))
