@@ -75,7 +75,6 @@ def findNumber( directory ):
 #identify all the structures in the input directory
 new = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
 Lines = new.communicate()[0].split()
-#print('{0}'.format(Lines))
 
 #determine who the user is
 user = subprocess.Popen(r'whoami', stdout=subprocess.PIPE)
@@ -84,7 +83,6 @@ name = str(user.communicate()[0].split()).replace("['","").replace("']","")
 #list to hold the job numbers and locations of the calculations.
 r, c = len(Lines), 2
 Jobs = [[0 for x in range(r)] for y in range(c)]
-#print('{0}'.format(Jobs))
 
 for counter, line in enumerate(Lines):
     if '_' not in line:
