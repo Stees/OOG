@@ -9,200 +9,205 @@ from re import sub
 import shutil
 import time
 
-def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
-    if '_' not in struc:
-        #subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
-        subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","c").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
-        time.sleep(0.030)
-        shutil.move(rDirectory, wFile)
-    elif '_' in struc and number !=1:
-        subprocess.Popen('mkdir {0}'.format(number), cwd=creDirectory, shell=True)
-        time.sleep(0.030)
-        shutil.move(rDirectory, wFile)
-    elif '_' in struc and number == 1:
-        #make the outer directory with the name of the structure first
-        subprocess.Popen('mkdir {0}'.format(str(struc).rsplit('_',1)[0]), cwd=creDirectory, shell=True)
-        time.sleep(0.030)
-        #make inner directory
-        subprocess.Popen('mkdir {0}'.format(str(number)), cwd=creDirectory+'/'+str(struc).rsplit('_',1)[0]+'/', shell=True)
-        time.sleep(0.030)
-        #move the file
-        shutil.move(rDirectory, wFile)
-    return
+getHost = subprocess.Popen('hostname', stdout=subprocess.PIPE)
+host = getHost.communicate()[0].split()[0]
 
-def writeScripts( filePath, structureFile ):
-    jobfile = open('{0}/job.slurm'.format(filePath), 'w')
-    jobfile.write('#!/bin/env bash\n\n')
-    jobfile.write('#SBATCH --job-name="{0}"\n'.format(structureFile.replace('.xyz','')))
-    jobfile.write('#SBATCH --output="{0}"\n'.format(structureFile.replace('.xyz','')))
-    jobfile.write('#SBATCH --nodes=1\n')
-    jobfile.write('#SBATCH --cluster=smp\n')
-    jobfile.write('#SBATCH --partition=smp-high\n')
-    jobfile.write('#SBATCH --ntasks-per-node=8\n')
-    jobfile.write('#SBATCH --time=0-12:00:00\n')
-    jobfile.write('#SBATCH --qos=short\n\n')
-    jobfile.write('module purge\n')
-    jobfile.write('module load openmpi/2.0.2\n')
-    jobfile.write('module load orca/4.0.2\n\n')
-    jobfile.write('date >> {0}.out\n'.format(structureFile.replace('.xyz','')))
-    jobfile.write('srun -n $SLURM_NNODES cp $SLURM_SUBMIT_DIR/* $LOCAL\n\n')
-    jobfile.write('ulimit -s unlimited\n\n')
-    jobfile.write('run_on_exit(){\n')
-    jobfile.write('    cp -R $LOCAL/* $SLURM_SUBMIT_DIR/\n')
-    jobfile.write('    cd $SLURM_SUBMIT_DIR\n')
-    jobfile.write('    find ./ -type f -exec chmod 640 {} +\n')
-    jobfile.write('}\n\n')
-    jobfile.write('trap run_on_exit EXIT\n\n')
-    jobfile.write('cd $LOCAL\n\n')
-    jobfile.write('$(which orca) geometryOptimizationOrca.inp > geometryOptimizationOrca.out\n')
-    jobfile.write('date >> {0}.out\n'.format(structureFile.replace('.xyz','')))
-    jobfile.write('exit 0\n')
-    jobfile.close()
-        
-    optimizationFile = open('{0}/geometryOptimizationOrca.inp'.format(filePath), 'w')
-    optimizationFile.write('#give keywords by using !\n')
-    optimizationFile.write('#functional, number of basis sets, dispersion correction\n')
-    optimizationFile.write('! PBE Def2-TZVP TIGHTSCF OPT D3BJ pal8\n\n')
-    optimizationFile.write('%scf\nMaxIter 500\nend\n')
-    #optimizationFile.write('%geom\nMaxIter 1000\nend\n')
-    optimizationFile.write('#the numbers after xyzfile correspond to charge and multiplicity\n')
-    optimizationFile.write('* xyzfile 0 1 {0}\n'.format(structureFile))
-    optimizationFile.close()
-    return
+if 'login0.crc.pitt.edu' in host:
+    def moveStructure( struc, number, creDirectory, rDirectory, wFile ):
+        if '_' not in struc:
+            #subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","\\,").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
+            subprocess.Popen('mkdir {0}'.format(str(struc).replace('.xyz','').replace("[","\\[").replace(",","c").replace("'","\\'").replace("]","\\]")), cwd=creDirectory, shell=True)
+            time.sleep(0.030)
+            shutil.move(rDirectory, wFile)
+        elif '_' in struc and number !=1:
+            subprocess.Popen('mkdir {0}'.format(number), cwd=creDirectory, shell=True)
+            time.sleep(0.030)
+            shutil.move(rDirectory, wFile)
+        elif '_' in struc and number == 1:
+            #make the outer directory with the name of the structure first
+            subprocess.Popen('mkdir {0}'.format(str(struc).rsplit('_',1)[0]), cwd=creDirectory, shell=True)
+            time.sleep(0.030)
+            #make inner directory
+            subprocess.Popen('mkdir {0}'.format(str(number)), cwd=creDirectory+'/'+str(struc).rsplit('_',1)[0]+'/', shell=True)
+            time.sleep(0.030)
+            #move the file
+            shutil.move(rDirectory, wFile)
+        return
 
-def findNumber( directory ):
-    tempNum = subprocess.Popen(r'ls -d */', stdout=subprocess.PIPE, cwd=directory, shell=True)
-    number = tempNum.communicate()[0].split()
-    maxNum = len(number)
-    return maxNum
-    
+    def writeScripts( filePath, structureFile ):
+        jobfile = open('{0}/job.slurm'.format(filePath), 'w')
+        jobfile.write('#!/bin/env bash\n\n')
+        jobfile.write('#SBATCH --job-name="{0}"\n'.format(structureFile.replace('.xyz','')))
+        jobfile.write('#SBATCH --output="{0}"\n'.format(structureFile.replace('.xyz','')))
+        jobfile.write('#SBATCH --nodes=1\n')
+        jobfile.write('#SBATCH --cluster=smp\n')
+        jobfile.write('#SBATCH --partition=smp-high\n')
+        jobfile.write('#SBATCH --ntasks-per-node=8\n')
+        jobfile.write('#SBATCH --time=0-12:00:00\n')
+        jobfile.write('#SBATCH --qos=short\n\n')
+        jobfile.write('module purge\n')
+        jobfile.write('module load openmpi/2.0.2\n')
+        jobfile.write('module load orca/4.0.2\n\n')
+        jobfile.write('date >> {0}.out\n'.format(structureFile.replace('.xyz','')))
+        jobfile.write('srun -n $SLURM_NNODES cp $SLURM_SUBMIT_DIR/* $LOCAL\n\n')
+        jobfile.write('ulimit -s unlimited\n\n')
+        jobfile.write('run_on_exit(){\n')
+        jobfile.write('    cp -R $LOCAL/* $SLURM_SUBMIT_DIR/\n')
+        jobfile.write('    cd $SLURM_SUBMIT_DIR\n')
+        jobfile.write('    find ./ -type f -exec chmod 640 {} +\n')
+        jobfile.write('}\n\n')
+        jobfile.write('trap run_on_exit EXIT\n\n')
+        jobfile.write('cd $LOCAL\n\n')
+        jobfile.write('$(which orca) geometryOptimizationOrca.inp > geometryOptimizationOrca.out\n')
+        jobfile.write('date >> {0}.out\n'.format(structureFile.replace('.xyz','')))
+        jobfile.write('exit 0\n')
+        jobfile.close()
 
-#identify all the structures in the input directory
-new = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
-Lines = new.communicate()[0].split()
+        optimizationFile = open('{0}/geometryOptimizationOrca.inp'.format(filePath), 'w')
+        optimizationFile.write('#give keywords by using !\n')
+        optimizationFile.write('#functional, number of basis sets, dispersion correction\n')
+        optimizationFile.write('! PBE Def2-TZVP TIGHTSCF OPT D3BJ pal8\n\n')
+        optimizationFile.write('%scf\nMaxIter 500\nend\n')
+        #optimizationFile.write('%geom\nMaxIter 1000\nend\n')
+        optimizationFile.write('#the numbers after xyzfile correspond to charge and multiplicity\n')
+        optimizationFile.write('* xyzfile 0 1 {0}\n'.format(structureFile))
+        optimizationFile.close()
+        return
 
-#determine who the user is
-user = subprocess.Popen(r'whoami', stdout=subprocess.PIPE)
-name = str(user.communicate()[0].split()).replace("['","").replace("']","")
+    def findNumber( directory ):
+        tempNum = subprocess.Popen(r'ls -d */', stdout=subprocess.PIPE, cwd=directory, shell=True)
+        number = tempNum.communicate()[0].split()
+        maxNum = len(number)
+        return maxNum
 
-#list to hold the job numbers and locations of the calculations.
-r, c = len(Lines), 2
-Jobs = [[0 for x in range(r)] for y in range(c)]
 
-for counter, line in enumerate(Lines):
-    if '_' not in line:
-        #determine if this structure has already been run somewhere else.
-        existing1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
-        #check Kyle's directories
-        existingSub = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/singleMolecules/')
-        eLines1 = existing1.communicate()[0].split()
-        eLines2 = existingSub.communicate()[0].split()
- 
- #      add all the existing structures together
-        finalELines = eLines1 + eLines2
-        
-        #compare the name of the structure to the names already present and determine if it needs to be optimized
-        structureCreate = 1
-        for itemCount, structure in enumerate(finalELines):
-            if (line.rsplit('.',1)[0].lower().replace(',','c') == structure.lower().replace(',','c')):
-                print('{0} is a repeated structure and will not be optimized'.format(line))
-                structureCreate = 0
-                break
+    #identify all the structures in the input directory
+    new = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
+    Lines = new.communicate()[0].split()
 
-        #if the structure does not exist already, create a directory having the name of the structure and move the .xyz file to that directory.
-        if (structureCreate == 1):
-            #print('{0}'.format(str(line).replace('.xyz','')))
+    #determine who the user is
+    user = subprocess.Popen(r'whoami', stdout=subprocess.PIPE)
+    name = str(user.communicate()[0].split()).replace("['","").replace("']","")
 
-            if (name == 'jpr54'):
-                createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/'
-                readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
-                
-            elif (name == 'krb115'):
-                createDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/'
-                readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
-                writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
+    #list to hold the job numbers and locations of the calculations.
+    r, c = len(Lines), 2
+    Jobs = [[0 for x in range(r)] for y in range(c)]
 
-            N = 0 #there will never be more than one optimization for a single molecule
-            #move the structure to the appropriate directory
-            moveStructure( line, N, createDirectory, readDirectory, writeFile )
+    for counter, line in enumerate(Lines):
+        if '_' not in line:
+            #determine if this structure has already been run somewhere else.
+            existing1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
+            #check Kyle's directories
+            existingSub = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/singleMolecules/')
+            eLines1 = existing1.communicate()[0].split()
+            eLines2 = existingSub.communicate()[0].split()
 
-            #now call the function to write the job.pbs and .inp files, passing it the filepath to use and the name of the structure file.
-            writeScripts( writeDirectory ,line )
+     #      add all the existing structures together
+            finalELines = eLines1 + eLines2
 
-            #submit the job.
+            #compare the name of the structure to the names already present and determine if it needs to be optimized
+            structureCreate = 1
+            for itemCount, structure in enumerate(finalELines):
+                if (line.rsplit('.',1)[0].lower().replace(',','c') == structure.lower().replace(',','c')):
+                    print('{0} is a repeated structure and will not be optimized'.format(line))
+                    structureCreate = 0
+                    break
+
+            #if the structure does not exist already, create a directory having the name of the structure and move the .xyz file to that directory.
+            if (structureCreate == 1):
+                #print('{0}'.format(str(line).replace('.xyz','')))
+
+                if (name == 'jpr54'):
+                    createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/'
+                    readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
+                    writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
+
+                elif (name == 'krb115'):
+                    createDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/'
+                    readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
+                    writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
+
+                N = 0 #there will never be more than one optimization for a single molecule
+                #move the structure to the appropriate directory
+                moveStructure( line, N, createDirectory, readDirectory, writeFile )
+
+                #now call the function to write the job.pbs and .inp files, passing it the filepath to use and the name of the structure file.
+                writeScripts( writeDirectory ,line )
+
+                #submit the job.
+                job = subprocess.Popen('sbatch job.slurm', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
+                #get the job number and structure name.
+                print('{0} {1}'.format(job.communicate()[0].split()[3],line.replace('.xyz','')))
+
+        elif '_' in line:
+            #determine if this geometry has already been run somewhere else.
+            existingI1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
+            #check Kyle's directories
+            existingI2 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/multipleMolecules/')
+            eLinesI1 = existingI1.communicate()[0].split()
+            eLinesI2 = existingI2.communicate()[0].split()
+            #print('{0} {1}'.format(eLinesI1, eLinesI2))
+
+            #if configurations of the molecules have been run before, identify the highest numbered configuration that has been run.
+            maxNumber1, maxNumber2 = '0', '0'
+            for configs in eLinesI1:
+                if (line.rsplit('_',1)[0].lower().replace(',','c') == configs.lower().replace(',','c')):
+                    #print('in loop\n')
+                    location = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
+                    maxNumber1 = findNumber( location )
+                    break
+            for configs in eLinesI2:
+                if (line.rsplit('_',1)[0].lower() == configs.lower()):
+                    location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
+                    maxNumber2 = findNumber ( location )
+                    break
+            highestNumber = int(max(int(maxNumber1),int(maxNumber2)))
+            #print('{0}'.format(highestNumber))
+            writeNumber = highestNumber + 1
+
+            #now that the highest existing number has been identified, create the directory in the appropriate location for the user. If highestNumber is 0, do a separate function call
+            if highestNumber == 0:
+                #need to create the new things.
+                if (name == 'jpr54'):
+                    createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/'
+                    readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
+                    writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
+                    xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
+
+                elif (name == 'krb115'):
+                    createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/'
+                    readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
+                    writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1'.format(str(line).rsplit('_',1)[0].replace(',','c'))
+                    xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
+
+            elif (highestNumber != 0):
+                if (name == 'jpr54'):
+                    createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
+                    readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
+                    writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/'.format(str(line).rsplit('_',1)[0], writeNumber)
+                    xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
+
+                elif (name == 'krb115'):
+                    createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
+                    readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
+                    writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
+                    writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber)
+                    xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
+
+            moveStructure( line, writeNumber, createDirectory, readDirectory, writeFile )
+            writeScripts( writeDirectory, xyzName )
             job = subprocess.Popen('sbatch job.slurm', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
-            #get the job number and structure name.
-            print('{0} {1}'.format(job.communicate()[0].split()[3],line.replace('.xyz','')))
-
-    elif '_' in line:
-        #determine if this geometry has already been run somewhere else.
-        existingI1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
-        #check Kyle's directories
-        existingI2 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/multipleMolecules/')
-        eLinesI1 = existingI1.communicate()[0].split()
-        eLinesI2 = existingI2.communicate()[0].split()
-        #print('{0} {1}'.format(eLinesI1, eLinesI2))
-
-        #if configurations of the molecules have been run before, identify the highest numbered configuration that has been run.
-        maxNumber1, maxNumber2 = '0', '0'
-        for configs in eLinesI1:
-            if (line.rsplit('_',1)[0].lower().replace(',','c') == configs.lower().replace(',','c')):
-                #print('in loop\n')
-                location = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
-                maxNumber1 = findNumber( location )
-                break
-        for configs in eLinesI2:
-            if (line.rsplit('_',1)[0].lower() == configs.lower()):
-                location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
-                maxNumber2 = findNumber ( location )
-                break
-        highestNumber = int(max(int(maxNumber1),int(maxNumber2)))
-        #print('{0}'.format(highestNumber))
-        writeNumber = highestNumber + 1
-
-        #now that the highest existing number has been identified, create the directory in the appropriate location for the user. If highestNumber is 0, do a separate function call
-        if highestNumber == 0:
-            #need to create the new things.
-            if (name == 'jpr54'):
-                createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/'
-                readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/1/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
-                xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
-
-            elif (name == 'krb115'):
-                createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/'
-                readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1/{1}'.format(str(line).rsplit('_',1)[0].replace(',','c'), str(line).rsplit('_',1)[0]+'_1.xyz')
-                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/1'.format(str(line).rsplit('_',1)[0].replace(',','c'))
-                xyzName = str(line).rsplit('_',1)[0]+'_1.xyz'
-            
-        elif (highestNumber != 0):
-            if (name == 'jpr54'):
-                createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
-                readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
-                writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}/{1}/'.format(str(line).rsplit('_',1)[0], writeNumber)
-                xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
-
-            elif (name == 'krb115'):
-                createDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'))
-                readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                writeFile = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/{2}'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber, str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz')
-                writeDirectory = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}/{1}/'.format(str(line).rsplit('_',1)[0].replace(',','c'), writeNumber)
-                xyzName = str(line).rsplit('_',1)[0]+'_'+str(writeNumber)+'.xyz'
-
-        moveStructure( line, writeNumber, createDirectory, readDirectory, writeFile )
-        writeScripts( writeDirectory, xyzName )
-        job = subprocess.Popen('sbatch job.slurm', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
-        jobNumber = job.communicate()[0].split()[3]
-        print('{0} {1}'.format(jobNumber,str(line).rsplit('_',1)[0]+'_'+str(writeNumber)))
-        #append job number to the JobId file so it can be compared in bindingEnergyTracker
-        jobFile = open('{0}JobId'.format(writeDirectory), 'w')
-        jobFile.write('{0}'.format(jobNumber))
-        jobFile.close()
-        
+            jobNumber = job.communicate()[0].split()[3]
+            print('{0} {1}'.format(jobNumber,str(line).rsplit('_',1)[0]+'_'+str(writeNumber)))
+            #append job number to the JobId file so it can be compared in bindingEnergyTracker
+            jobFile = open('{0}JobId'.format(writeDirectory), 'w')
+            jobFile.write('{0}'.format(jobNumber))
+            jobFile.close()
+else:
+    print('\nYou are logged in to the wrong location. Log in to opa.\n')
 
