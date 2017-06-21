@@ -41,7 +41,7 @@ if 'login0.crc.pitt.edu' in host:
         jobfile.write('#SBATCH --output="{0}"\n'.format(structureFile.replace('.xyz','')))
         jobfile.write('#SBATCH --nodes=1\n')
         jobfile.write('#SBATCH --cluster=smp\n')
-        jobfile.write('#SBATCH --partition=smp-high\n')
+        #jobfile.write('#SBATCH --partition=smp-high\n')
         jobfile.write('#SBATCH --ntasks-per-node=8\n')
         jobfile.write('#SBATCH --time=0-12:00:00\n')
         jobfile.write('#SBATCH --qos=short\n\n')
