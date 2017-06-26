@@ -37,7 +37,7 @@ if 'login0.crc.pitt.edu' in host:
         jobfile = open('{0}/job.slurm'.format(filePath), 'w')
         jobfile.write('#!/bin/env bash\n\n')
         jobfile.write('#SBATCH --job-name="{0}"\n'.format(structureFile.replace('.xyz','')))
-        jobfile.write('#SBATCH --output="{0}"\n'.format(structureFile.replace('.xyz','')))
+        jobfile.write('#SBATCH --output="{0}.out"\n'.format(structureFile.replace('.xyz','')))
         jobfile.write('#SBATCH --nodes=1\n')
         jobfile.write('#SBATCH --cluster=smp\n')
         jobfile.write('#SBATCH --partition=smp\n')
