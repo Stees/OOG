@@ -82,11 +82,11 @@ if 'login0.crc.pitt.edu' in host:
 
 
     #identify all the structures in the input directory
-    new = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
+    new = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
     Lines = new.communicate()[0].split()
 
     #determine who the user is
-    user = subprocess.Popen(r'whoami', stdout=subprocess.PIPE)
+    user = subprocess.Popen('whoami', stdout=subprocess.PIPE)
     name = str(user.communicate()[0].split()).replace("['","").replace("']","")
 
     #list to hold the job numbers and locations of the calculations.
@@ -96,9 +96,9 @@ if 'login0.crc.pitt.edu' in host:
     for counter, line in enumerate(Lines):
         if '_' not in line:
             #determine if this structure has already been run somewhere else.
-            existing1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
+            existing1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
             #check Kyle's directories
-            existingSub = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/singleMolecules/')
+            existingSub = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/krb115/orca/singleMolecules/')
             eLines1 = existing1.communicate()[0].split()
             eLines2 = existingSub.communicate()[0].split()
 
@@ -115,8 +115,6 @@ if 'login0.crc.pitt.edu' in host:
 
             #if the structure does not exist already, create a directory having the name of the structure and move the .xyz file to that directory.
             if (structureCreate == 1):
-                #print('{0}'.format(str(line).replace('.xyz','')))
-
                 if (name == 'jpr54'):
                     createDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/'
                     readDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/{0}'.format(str(line))
@@ -143,9 +141,10 @@ if 'login0.crc.pitt.edu' in host:
 
         elif '_' in line:
             #determine if this geometry has already been run somewhere else.
-            existingI1 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
+            existingI1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
+
             #check Kyle's directories
-            existingI2 = subprocess.Popen(r'ls', stdout=subprocess.PIPE, cwd=r'/ihome/kjohnson/krb115/orca/multipleMolecules/')
+            existingI2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
             eLinesI1 = existingI1.communicate()[0].split()
             eLinesI2 = existingI2.communicate()[0].split()
             #print('{0} {1}'.format(eLinesI1, eLinesI2))
@@ -160,7 +159,7 @@ if 'login0.crc.pitt.edu' in host:
                     break
             for configs in eLinesI2:
                 if (line.rsplit('_',1)[0].lower() == configs.lower()):
-                    location = '/ihome/kjohnson/krb115/orca/multipleMolecules/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
+                    location = '/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
                     maxNumber2 = findNumber ( location )
                     break
             highestNumber = int(max(int(maxNumber1),int(maxNumber2)))
