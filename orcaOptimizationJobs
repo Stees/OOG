@@ -98,7 +98,7 @@ if 'login0.crc.pitt.edu' in host:
             #determine if this structure has already been run somewhere else.
             existing1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
             #check Kyle's directories
-            existingSub = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/krb115/orca/singleMolecules/')
+            existing2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
             eLines1 = existing1.communicate()[0].split()
             eLines2 = existingSub.communicate()[0].split()
 
@@ -121,29 +121,33 @@ if 'login0.crc.pitt.edu' in host:
                     writeFile = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
                     writeDirectory = '/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
 
-                elif (name == 'krb115'):
-                    createDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/'
-                    readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
-                    writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
-                    writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
+                # elif (name == 'krb115'):
+                #     createDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/'
+                #     readDirectory = '/ihome/kjohnson/krb115/orca/structureInputs/{0}'.format(str(line))
+                #     writeFile = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}/{1}'.format(str(line).replace('.xyz','').replace(',','c'), str(line))
+                #     writeDirectory = '/ihome/kjohnson/krb115/orca/singleMolecules/{0}'.format(str(line).replace('.xyz','').replace(',','c'))
 
                 N = 0 #there will never be more than one optimization for a single molecule
                 #move the structure to the appropriate directory
                 moveStructure( line, N, createDirectory, readDirectory, writeFile )
 
-                #now call the function to write the job.pbs and .inp files, passing it the filepath to use and the name of the structure file.
+                #now call the function to write the job.slurm and .inp files, passing it the filepath to use and the name of the structure file.
                 writeScripts( writeDirectory ,line )
 
                 #submit the job.
                 job = subprocess.Popen('sbatch job.slurm', stdout=subprocess.PIPE, cwd=writeDirectory, shell=True)
-                #get the job number and structure name.
-                print('{0} {1}'.format(job.communicate()[0].split()[3],line.replace('.xyz','')))
+                #get the job number and structure name. Write the JobId file.
+                jobNumber = job.communicate()[0].split()[3]
+                print('{0} {1}'.format(jobNumber,line.replace('.xyz','')))
+                jobFile = open('{0}JobId'.format(writeDirectory), 'w')
+                jobFile.write('{0}'.format(jobNumber))
+                jobFile.close()
 
         elif '_' in line:
             #determine if this geometry has already been run somewhere else.
             existingI1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
 
-            #check Kyle's directories
+            #check finished calculation directories
             existingI2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
             eLinesI1 = existingI1.communicate()[0].split()
             eLinesI2 = existingI2.communicate()[0].split()
