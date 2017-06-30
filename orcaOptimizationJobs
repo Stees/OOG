@@ -97,7 +97,7 @@ if 'login0.crc.pitt.edu' in host:
         if '_' not in line:
             #determine if this structure has already been run somewhere else.
             existing1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
-            #check Kyle's directories
+            #check storage directories
             existing2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
             eLines1 = existing1.communicate()[0].split()
             eLines2 = existingSub.communicate()[0].split()
