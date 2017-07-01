@@ -140,7 +140,7 @@ if 'login0.crc.pitt.edu' in host:
                 #get the job number and structure name. Write the JobId file.
                 jobNumber = job.communicate()[0].split()[3]
                 print('{0} {1}'.format(jobNumber,line.replace('.xyz','')))
-                jobFile = open('{0}JobId'.format(writeDirectory), 'w')
+                jobFile = open('{0}/JobId'.format(writeDirectory), 'w')
                 jobFile.write('{0}'.format(jobNumber))
                 jobFile.close()
 
