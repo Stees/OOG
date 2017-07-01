@@ -45,6 +45,7 @@ if 'login0.crc.pitt.edu' in host:
         #jobfile.write('#SBATCH --mem=5g\n')
         jobfile.write('#SBATCH --time=0-12:00:00\n')
         jobfile.write('#SBATCH --qos=short\n\n')
+        #jobfile.write('shopt -s extglob\n')
         jobfile.write('module purge\n')
         jobfile.write('module load openmpi/2.0.2\n')
         jobfile.write('module load orca/4.0.2\n\n')
@@ -52,7 +53,7 @@ if 'login0.crc.pitt.edu' in host:
         jobfile.write('srun -n $SLURM_NNODES cp $SLURM_SUBMIT_DIR/* $LOCAL\n\n')
         #jobfile.write('ulimit -s unlimited\n\n')
         jobfile.write('run_on_exit(){\n')
-        jobfile.write('    cp -R $LOCAL/* $SLURM_SUBMIT_DIR/\n')
+        jobfile.write('    cp -R $LOCAL/{*.prop,geometryOptimizationOrca.xyz,*engrad,*opt,*gbw,*txt,*out,*trj,*tmp} $SLURM_SUBMIT_DIR/\n')
         jobfile.write('    cd $SLURM_SUBMIT_DIR\n')
         jobfile.write('    find ./ -type f -exec chmod 640 {} +\n')
         jobfile.write('}\n\n')
@@ -100,7 +101,7 @@ if 'login0.crc.pitt.edu' in host:
             #check storage directories
             existing2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
             eLines1 = existing1.communicate()[0].split()
-            eLines2 = existingSub.communicate()[0].split()
+            eLines2 = existing2.communicate()[0].split()
 
      #      add all the existing structures together
             finalELines = eLines1 + eLines2
