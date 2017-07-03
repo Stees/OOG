@@ -76,9 +76,17 @@ if 'login0.crc.pitt.edu' in host:
         return
 
     def findNumber( directory ):
-        tempNum = subprocess.Popen(r'ls -d */', stdout=subprocess.PIPE, cwd=directory, shell=True)
+        tempNum = subprocess.Popen(r'ls -d */', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=directory, shell=True)
         number = tempNum.communicate()[0].split()
-        maxNum = len(number)
+        if 'ls:' in number:
+            maxNum = 0
+        else:
+            tempMaxVal = 0
+            for integer in number:
+                tempVal = integer.split("/")[0]
+                if int(tempVal) > tempMaxVal:
+                    tempMaxVal = int(tempVal)
+            maxNum = tempMaxVal
         return maxNum
 
 
@@ -155,7 +163,7 @@ if 'login0.crc.pitt.edu' in host:
             #print('{0} {1}'.format(eLinesI1, eLinesI2))
 
             #if configurations of the molecules have been run before, identify the highest numbered configuration that has been run.
-            maxNumber1, maxNumber2 = '0', '0'
+            maxNumber1, maxNumber2 = 0, 0
             for configs in eLinesI1:
                 if (line.rsplit('_',1)[0].lower().replace(',','c') == configs.lower().replace(',','c')):
                     #print('in loop\n')
