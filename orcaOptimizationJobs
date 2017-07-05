@@ -63,7 +63,6 @@ if 'login0.crc.pitt.edu' in host:
         jobfile.write('date >> {0}.out\n'.format(structureFile.replace('.xyz','')))
         jobfile.write('exit 0\n')
         jobfile.close()
-
         optimizationFile = open('{0}/geometryOptimizationOrca.inp'.format(filePath), 'w')
         optimizationFile.write('#give keywords by using !\n')
         optimizationFile.write('#functional, number of basis sets, dispersion correction\n')
@@ -93,27 +92,19 @@ if 'login0.crc.pitt.edu' in host:
     #identify all the structures in the input directory
     new = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/structureInputs/')
     Lines = new.communicate()[0].split()
-
     #determine who the user is
     user = subprocess.Popen('whoami', stdout=subprocess.PIPE)
     name = str(user.communicate()[0].split()).replace("['","").replace("']","")
-
     #list to hold the job numbers and locations of the calculations.
     r, c = len(Lines), 2
     Jobs = [[0 for x in range(r)] for y in range(c)]
-
     for counter, line in enumerate(Lines):
         if '_' not in line:
-            #determine if this structure has already been run somewhere else.
-            existing1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
-            #check storage directories
+            #determine if this structure has already been run somewhere else
             existing2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/singleMolecules/')
-            eLines1 = existing1.communicate()[0].split()
             eLines2 = existing2.communicate()[0].split()
-
-     #      add all the existing structures together
-            finalELines = eLines1 + eLines2
-
+            #add all the existing structures together
+            finalELines = eLines2
             #compare the name of the structure to the names already present and determine if it needs to be optimized
             structureCreate = 1
             for itemCount, structure in enumerate(finalELines):
@@ -121,7 +112,6 @@ if 'login0.crc.pitt.edu' in host:
                     print('{0} is a repeated structure and will not be optimized'.format(line))
                     structureCreate = 0
                     break
-
             #if the structure does not exist already, create a directory having the name of the structure and move the .xyz file to that directory.
             if (structureCreate == 1):
                 if (name == 'jpr54'):
