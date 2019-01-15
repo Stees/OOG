@@ -141,7 +141,7 @@ if 'login0.crc.pitt.edu' in host:
             #determine if this geometry has already been run somewhere else.
             existingI1 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/ihome/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
             #check finished calculation directories
-            existingI2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
+            existingI2 = subprocess.Popen('ls', stdout=subprocess.PIPE, cwd='/zfs1/kjohnson/jpr54/orca/geometryOptimizations/interactions/')
             eLinesI1 = existingI1.communicate()[0].split()
             eLinesI2 = existingI2.communicate()[0].split()
             #print('{0} {1}'.format(eLinesI1, eLinesI2))
@@ -154,7 +154,7 @@ if 'login0.crc.pitt.edu' in host:
                     break
             for configs in eLinesI2:
                 if (line.rsplit('_',1)[0].lower() == configs.lower()):
-                    location = '/zfs1/2/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
+                    location = '/zfs1/kjohnson/jpr54/orca/geometryOptimizations/interactions/{0}'.format(line.rsplit('_',1)[0].replace(',','c'))
                     maxNumber2 = findNumber( location )
                     break
             highestNumber = int(max(int(maxNumber1),int(maxNumber2)))
